@@ -309,9 +309,11 @@
     });
 
     nextBtn.addEventListener('click', (e) => {
-        // e.preventDefault();
-        // Tambahkan kode untuk kembali ke halaman sebelumnya atau halaman utama
-        // Misalnya: window.location.href = 'index.html';
+        // If you have specific logic to execute before navigating, do it here
+        // e.g., saving state or showing a confirmation dialog
+
+        // If you don't need to prevent the default action, you can remove e.preventDefault()
+        // e.preventDefault(); // Remove this line if you want the default navigation to occur
     });
 
     answerInput.addEventListener('keyup', (e) => {
