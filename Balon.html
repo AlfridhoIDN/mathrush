@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Matematika Sederhana</title>
+    <link rel="stylesheet" href="./CSS/Balon.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="overlay" class="hidden"></div>
+        <div id="question-box" class="hidden">
+            <p id="question"></p>
+            <input type="number" id="answer" placeholder="Jawaban Anda">
+            <button id="submit">Kirim</button>
+        </div>
+        <div id="custom-alert" class="hidden">
+            <p id="alert-message"></p>
+            <button id="alert-ok">OK</button>
+        </div>
+        <div id="confetti-container"></div>
+
+        <!-- Timer dan skor akhir -->
+        <div id="timer">Waktu: <span id="time-left">90</span> detik</div>
+        
+        <!-- Di dalam div id="game-container" -->
+        <div id="result-popup" class="hidden">
+            <div class="popup-content">
+                <h2 id="result-message"></h2>
+                <p>Anda berhasil memecahkan <span id="score"></span> balon.</p>
+                <button id="restart-btn">Mulai Ulang</button>
+                <a id="next-btn" href="pick.html" class="button">Kembali</a>
+            </div>
+        </div>
+        <audio id="pop-sound" src="./ASSET/pop.mp3"></audio>
+        <audio id="correct-sound" src="./ASSET/yay.mp3"></audio>
+        <audio id="wrong-sound" src="./ASSET/wrong.mp3"></audio>
+    </div>
+
+    <script>
+    const gameContainer = document.getElementById('game-container');
+    const questionBox = document.getElementById('question-box');
+    const questionElement = document.getElementById('question');
+    const answerInput = document.getElementById('answer');
+    const submitButton = document.getElementById('submit');
+    const overlay = document.getElementById('overlay');
+    const customAlert = document.getElementById('custom-alert');
+    const alertMessage = document.getElementById('alert-message');
+    const alertOk = document.getElementById('alert-ok');
+    const confettiContainer = document.getElementById('confetti-container');
+    const timerElement = document.getElementById('time-left');
+    const resultPopup = document.getElementById('result-popup');
+    const resultMessage = document.getElementById('result-message');
+    const scoreElement = document.getElementById('score');
+    const restartBtn = document.getElementById('restart-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    let currentAnswer = 0;
+    let currentBalloon = null;
+    let balloons = [];
+    let score = 0;
+    let balloonsPopped = 0; // Menambahkan variabel untuk menghitung balon yang dipecahkan
+    let timeLeft = 90;
+    let timerInterval;
+
+    function getRandomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function getRandomOperator() {
+        const operators = ['+', '-', 'x'];
+        return operators[Math.floor(Math.random() * operators.length)];
+    }
+
+    function calculateAnswer(num1, num2, operator) {
+        switch (operator) {
+            case '+':
+                return num1 + num2;
+            case '-':
+                return num1 - num2;
+            case 'x':
+                return num1 * num2;
+        }
+    }
+
+    function createBalloons(count, questionCount) {
+        for (let i = 0; i < count; i++) {
+            const balloon = document.createElement('div');
+            balloon.classList.add('balloon');
+            balloon.style.left = `${Math.random() * 90}%`;
+            balloon.style.top = `${Math.random() * 70}%`;
+            balloon.style.animation = `float ${3 + Math.random() * 2}s ease-in-out infinite`;
+            balloon.style.animationDelay = `${Math.random() * 2}s`;
+            
+            // Menentukan apakah balon ini memiliki soal atau tidak
+            if (i < questionCount) {
+                balloon.dataset.hasQuestion = 'true';
+                balloon.addEventListener('click', onBalloonClick);
+            } else {
+                balloon.dataset.hasQuestion = 'false';
+                balloon.addEventListener('click', onEmptyBalloonClick);
+            }
+            
+            gameContainer.appendChild(balloon);
+            balloons.push(balloon);
+        }
+        // Mengacak urutan balon
+        shuffleArray(balloons);
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function onBalloonClick(event) {
+        currentBalloon = event.target;
+        createParticles(currentBalloon);
+        currentBalloon.style.visibility = 'hidden';
+        currentBalloon.removeEventListener('click', onBalloonClick);
+        playSound('pop-sound');
+        balloonsPopped++; // Tambahkan ini
+        setTimeout(() => {
+            showQuestion();
+        }, 1000);
+    }
+
+    function createParticles(balloon) {
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            gameContainer.appendChild(particle);
+
+            const rect = balloon.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 5 + 2;
+            const dx = Math.cos(angle) * speed;
+            const dy = Math.sin(angle) * speed;
+
+            animateParticle(particle, dx, dy);
+        }
+    }
+
+    function animateParticle(particle, dx, dy) {
+        let x = parseFloat(particle.style.left);
+        let y = parseFloat(particle.style.top);
+        let opacity = 1;
+
+        function update() {
+            x += dx;
+            y += dy;
+            opacity -= 0.02;
+
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            particle.style.opacity = opacity;
+
+            if (opacity > 0) {
+                requestAnimationFrame(update);
+            } else {
+                particle.remove();
+            }
+        }
+
+        requestAnimationFrame(update);
+    }
+
+    function showQuestion() {
+        const num1 = getRandomNumber(-10, 10);
+        const num2 = getRandomNumber(-10, 10);
+        const operator = getRandomOperator();
+
+        currentAnswer = calculateAnswer(num1, num2, operator);
+
+        let questionText = '';
+        if (num1 < 0) {
+            questionText += `(${num1})`;
+        } else {
+            questionText += num1;
+        }
+        questionText += ` ${operator} `;
+        if (num2 < 0) {
+            questionText += `(${num2})`;
+        } else {
+            questionText += num2;
+        }
+        questionText += ' = ?';
+
+        questionElement.textContent = questionText;
+        overlay.classList.remove('hidden');
+        overlay.classList.add('show');
+        questionBox.classList.remove('hidden');
+        questionBox.classList.add('show');
+        answerInput.value = '';
+        answerInput.focus();
+    }
+
+    function checkAnswer() {
+        const userAnswer = parseInt(answerInput.value);
+
+        if (userAnswer === currentAnswer) {
+            showCustomAlert('Benar! Jawaban yang bagus!');
+            playSound('correct-sound');
+            removeBalloon();
+            score++;
+            balloonsPopped++;
+        } else {
+            showCustomAlert('Maaf, jawaban salah. Coba lagi!');
+            playSound('wrong-sound'); // Pastikan ini dipanggil
+            resetBalloon();
+        }
+    }
+
+    function showCustomAlert(message) {
+        alertMessage.textContent = message;
+        customAlert.classList.remove('hidden');
+        customAlert.classList.add('show');
+        overlay.classList.remove('hidden');
+        overlay.classList.add('show');
+    }
+
+    function hideCustomAlert() {
+        customAlert.classList.remove('show');
+        overlay.classList.remove('show');
+        questionBox.classList.remove('show');
+        setTimeout(() => {
+            customAlert.classList.add('hidden');
+            overlay.classList.add('hidden');
+            questionBox.classList.add('hidden');
+        }, 300); // Sesuaikan dengan durasi animasi
+    }
+
+    function removeBalloon(balloon) {
+        const index = balloons.indexOf(balloon);
+        if (index > -1) {
+            balloons.splice(index, 1);
+        }
+        balloon.remove();
+        if (balloon === currentBalloon) {
+            currentBalloon = null;
+        }
+        checkGameCompletion();
+    }
+
+    function resetBalloon() {
+        currentBalloon.style.visibility = 'visible';
+        currentBalloon = null;
+    }
+
+    function createConfetti() {
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            confetti.style.left = `${Math.random() * 100}%`;
+            confetti.style.animationDuration = `${Math.random() * 2 + 2}s`;
+            confetti.style.animationDelay = `${Math.random() * 2}s`;
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            confetti.style.width = `${Math.random() * 10 + 5}px`;
+            confetti.style.height = `${Math.random() * 10 + 5}px`;
+            confettiContainer.appendChild(confetti);
+        }
+    }
+
+    function checkGameCompletion() {
+        if (balloons.length === 0 || balloons.every(balloon => balloon.dataset.hasQuestion === 'false')) {
+            endGame(true);
+        }
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            timerElement.textContent = timeLeft;
+
+            if (timeLeft === 0) {
+                endGame(false);
+            }
+        }, 1000);
+    }
+
+    function endGame(isWin = false) {
+        clearInterval(timerInterval);
+        
+        if (isWin) {
+            createConfetti();
+            resultMessage.textContent = 'Selamat! Anda berhasil memecahkan semua balon!';
+        } else {
+            resultMessage.textContent = 'Waktu habis!';
+        }
+        
+        // Selalu tampilkan jumlah balon yang dipecahkan
+        document.querySelector('#result-popup .popup-content p').style.display = 'block';
+        scoreElement.textContent = balloonsPopped;
+        
+        resultPopup.classList.remove('hidden');
+        resultPopup.classList.add('show');
+    }
+
+    restartBtn.addEventListener('click', () => {
+        location.reload();
+    });
+
+    nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Tambahkan kode untuk kembali ke halaman sebelumnya atau halaman utama
+        // Misalnya: window.location.href = 'index.html';
+    });
+
+    answerInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+
+    alertOk.addEventListener('click', hideCustomAlert);
+
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            hideCustomAlert();
+            resetBalloon();
+        }
+    });
+
+    submitButton.addEventListener('click', checkAnswer);
+
+    // Inisialisasi game
+    createBalloons(10, 7); // 10
+    startTimer();
+
+    function playSound(soundId) {
+        const sound = document.getElementById(soundId);
+        sound.currentTime = 0; // Reset audio ke awal
+        sound.play();
+    }
+
+    document.addEventListener('click', function() {
+        document.removeEventListener('click', arguments.callee);
+        const audio = document.createElement('audio');
+        audio.src = 'sounds/silent.mp3'; // File audio kosong atau sangat pendek
+        audio.play().then(() => {
+            // Audio sudah diizinkan
+        }).catch(error => {
+            console.log('Autoplay tidak diizinkan');
+        });
+    }, { once: true });
+
+    function onEmptyBalloonClick(event) {
+        const balloon = event.target;
+        createParticles(balloon);
+        balloon.style.visibility = 'hidden';
+        balloon.removeEventListener('click', onEmptyBalloonClick);
+        playSound('pop-sound');
+        balloonsPopped++; // Tambahkan ini
+        showCustomAlert('Balon kosong!');
+        setTimeout(() => {
+            removeBalloon(balloon);
+        }, 1000);
+    }
+    </script>
+</body>
+</html>

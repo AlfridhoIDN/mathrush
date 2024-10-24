@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pairs Game</title>
+    <style>
+
+
+        @font-face {
+            font-family: 'font-pairs';
+            src: url('ASSET/BasoteRegular-9MGxj.ttf');
+        }
+        html {
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;    
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-image: url(ASSET/background.png);
+            font-family: 'Arial', sans-serif;
+            background-size: cover; /* Mengubah ukuran background agar menutupi area */
+            background-repeat: repeat-x; /* Agar background bergerak secara horizontal */
+            background-position: 0 0; /* Set posisi awal */
+            animation: slideBackground 60s linear infinite; 
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
+        }
+
+                @keyframes slideBackground {
+            0% {
+                background-position: 0 0; /* Posisi awal */
+            }
+            100% {
+                background-position: -1000px 0; /* Ubah nilainya sesuai dengan ukuran gambar untuk looping */
+            }
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);    
+            grid-gap: 15px;
+            justify-content: center;
+            padding: 20px;
+            background-color:#5d8a55;
+            border-radius: 15px;
+            border: 15px solid #56393a;
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+            width: 55vw;
+            height: 60vh;
+        
+        }
+
+        .card {
+            width: 95px;
+            height:95px;
+            background-color: #304b74;
+            cursor: pointer;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: transparent;
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 20px 40px -20px, rgba(0, 0, 0, 0.3) 0px 10px 20px -10px;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+            color: white;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 20px 40px -20px, rgba(0, 0, 0, 0.3) 0px 10px 20px -10px;
+        }
+
+        .card.matched {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #timer, #score {
+            font-size: 24px;
+            color: white;
+            font-family: 'font-pairs';
+        }
+
+        #timer {
+            margin-bottom: 20px;
+        }
+
+        .star {
+            position: absolute;
+            font-size: 24px;
+            transition: transform 1s ease, opacity 1s ease;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 30px;
+            border: none;
+            z-index: 10;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 5;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .win-stars {
+            font-size: 36px;
+            margin-top: 20px;
+        }
+
+        .win-stars span {
+            font-size: 36px;
+        }
+
+        .win-stars .middle-star {
+            font-size: 48px;
+        }
+
+        .hidden-star {
+            opacity: 0;
+        }
+
+        .final-score {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+
+        .popup.show {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            width: 55vw; /* Sesuaikan dengan lebar board */
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-family: 'font-pairs';
+            font-size: 25px;
+        }
+
+                @media (max-width: 768px) {
+            .board {
+                grid-template-columns: repeat(4, 1fr); /* 3 kolom pada tablet */
+            }
+
+            #timer, #score {
+                font-size: 20px; /* Ukuran font lebih kecil */
+            }
+
+            .button {
+                font-size: 14px; /* Ukuran teks tombol lebih kecil */
+            }
+        }
+
+
+        @media (max-width: 480px) {
+            .board {
+                grid-template-columns: repeat(4, 1fr);
+                grid-gap: 7px; 
+                padding-left: 70px;
+                padding-right: 70px;
+                
+                
+            }
+
+            #timer, #score {
+                font-size: 15px; /* Ukuran font lebih kecil */
+            }
+
+            .button {
+                font-size: 12px; /* Ukuran teks tombol lebih kecil */
+            }
+            .card {
+            width: 18.5vw;
+            height: 13vh;
+           
+            
+            
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="header">
+    <div id="timer">Time left: 60s</div>
+    <div id="score">⭐ Score : 0</div>
+    </div>
+    <div id="game-board" class="board">
+        <!-- Cards will be dynamically added here -->
+    </div>
+    
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popupWin">
+        <p>Congrats!</p>
+        <div id="win-stars" class="win-stars"></div>
+        <div id="final-score" class="final-score"></div>
+        <div class="button-container">
+            <button class="button" id="left-button">🏠︎</button>
+            <button class="button" id="continue-buttonWin">≡</button>
+            <button class="button" id="right-button">↺</button>
+        </div>
+    </div>
+    <script>
+        const images = [
+            { id: '1', src: './ASSET/divided.png' },
+            { id: '1', src: './ASSET/dividedL.png' },
+            { id: '2', src: './ASSET/equals.png' },
+            { id: '2', src: './ASSET/equalsL.png' },
+            { id: '3', src: './ASSET/minus.png' },
+            { id: '3', src: './ASSET/minusL.png' },
+            { id: '4', src: './ASSET/multiple.png' },
+            { id: '4', src: './ASSET/multipleL.png' },
+            { id: '5', src: './ASSET/percent.png' },
+            { id: '5', src: './ASSET/percentL.png' },
+            { id: '6', src: './ASSET/phi.png' },
+            { id: '6', src: './ASSET/phiL.png' },
+            { id: '7', src: './ASSET/plus.png' },
+            { id: '7', src: './ASSET/plusL.png' },
+            { id: '8', src: './ASSET/squareroot.png' },
+            { id: '8', src: './ASSET/squarerootL.png' }
+        ];
+
+        let hasFlippedCard = false;
+        let firstCard, secondCard;
+        let lockBoard = false;
+        let timeLeft = 60;
+        const timerElement = document.getElementById('timer');
+        const gameBoard = document.getElementById('game-board');
+        const scoreElement = document.getElementById('score');
+        const overlay = document.getElementById('overlay');
+        const popupWin = document.getElementById('popupWin');
+        const continueButtonWin = document.getElementById('continue-buttonWin');
+        const leftButton = document.getElementById('left-button');
+        const rightButton = document.getElementById('right-button');
+        const winStarsElement = document.getElementById('win-stars');
+        const finalScoreElement = document.getElementById('final-score');
+        let matchedPairs = 0;
+        let score = 0;
+        let timerInterval;
+        let gameWon = false; // Track if the game is won
+
+        continueButtonWin.addEventListener('click', () => {
+            window.location.href = 'pick.html'; // Redirect to game.html
+        });
+
+        leftButton.addEventListener('click', () => {
+            window.location.href = 'index.html'; // Redirect to landingpage.html
+        });
+
+        rightButton.addEventListener('click', () => {
+            location.reload(); // Refresh the page
+        });
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function createBoard() {
+            shuffle(images);
+            images.forEach(image => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.id = image.id;
+                card.dataset.image = image.src;
+                card.addEventListener('click', flipCard);
+                gameBoard.appendChild(card);
+            });
+        }
+
+        function flipCard() {
+            if (lockBoard) return;
+            if (this === firstCard) return;
+
+            this.classList.add('flipped');
+            this.style.backgroundImage = `url(${this.dataset.image})`;
+
+            if (!hasFlippedCard) {
+                hasFlippedCard = true;
+                firstCard = this;
+                return;
+            }
+
+            secondCard = this;
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            let isMatch = firstCard.dataset.id === secondCard.dataset.id;
+            isMatch ? disableCards() : unflipCards();
+        }
+
+        function disableCards() {
+            lockBoard = true;
+            setTimeout(() => {
+                firstCard.classList.add('matched');
+                secondCard.classList.add('matched');
+                createStar(firstCard);
+                createStar(secondCard);
+                updateScore();
+                resetBoard();
+            }, 500); // Delay of 2 seconds before setting opacity to 0
+            matchedPairs++;
+            if (matchedPairs === images.length / 2) {
+                clearInterval(timerInterval);
+                gameWon = true; // Set gameWon to true
+                setTimeout(showPopupWin, 2000); // Delay of 2 seconds before showing the win popup
+            }
+        }
+
+        function createStar(card) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.textContent = '⭐';
+            document.body.appendChild(star);
+
+            const cardRect = card.getBoundingClientRect();
+            const scoreRect = scoreElement.getBoundingClientRect();
+
+            star.style.left = `${cardRect.left + cardRect.width / 2}px`;
+            star.style.top = `${cardRect.top + cardRect.height / 2}px`;
+
+            requestAnimationFrame(() => {
+                star.style.transform = `translate(${scoreRect.left - cardRect.left}px, ${scoreRect.top - cardRect.top}px)`;
+                star.style.opacity = '0';
+            });
+
+            setTimeout(() => {
+                star.remove();
+            }, 1000);
+        }
+
+        function unflipCards() {
+            lockBoard = true;
+            setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                firstCard.style.backgroundImage = '';
+                secondCard.style.backgroundImage = '';
+                resetBoard();
+            }, 1000);
+        }
+
+        function resetBoard() {
+            [hasFlippedCard, lockBoard] = [false, false];
+            [firstCard, secondCard] = [null, null];
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (!gameWon) { // Only decrease time if the game is not won
+                    timeLeft--;
+                    timerElement.textContent = `Time left: ${timeLeft}s`;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        setTimeout(showPopupWin, 2000); // Show the win popup with delay
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateScore() {
+            score += 50;
+            scoreElement.textContent = `⭐ Point: ${score}`;
+        }
+
+        function showPopupWin() {
+            overlay.style.display = 'block';
+            popupWin.style.display = 'block';
+            let stars = '';
+            if (score >= 400) {
+                stars = '<span>⭐</span> <span class="middle-star">⭐</span> <span>⭐</span>';
+            } else if (score >= 250) {
+                stars = '<span>⭐</span> <span class="middle-star">⭐</span> <span class="hidden-star">⭐</span>';
+            } else if (score >= 50) {
+                stars = '<span>⭐</span> <span class="hidden-star middle-star">⭐</span> <span class="hidden-star">⭐</span>';
+            }
+            winStarsElement.innerHTML = stars;
+            finalScoreElement.textContent = `Score: ${score}`;
+        }
+
+        createBoard();
+        startTimer();
+    </script>
+</body>
+</html>

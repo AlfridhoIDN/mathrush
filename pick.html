@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kotak Tengah</title>
+    <style>
+        html {
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
+        }
+        body{
+            background-color: grey;
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .box {
+            width: 200px;
+            height: 200px;
+            margin: 30px;
+            background-color: lightblue;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: ease-in 0.1s;
+        }
+        .box:hover{
+            transform: translateY(-4px);
+            transition: ease-in 0.1s;
+        }
+        #satu{
+            background-image: url(./ASSET/baloon.jpeg);
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+        }
+        #dua{
+            background-image: url(./ASSET/pairs.jpeg);
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+        }
+        #tiga{
+            background-image: url(./ASSET/baloon.jpeg);
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+        }
+        .box-name {
+            margin-top: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <a href="Balon.html" class="box" id="satu"></a>
+            <div class="box-name">Baloon Quest</div>
+        </div>
+        <div>
+            <a href="reallylastpair.html" class="box" id="dua"></a>
+            <div class="box-name">Pairs the Symbols</div>
+        </div>
+        <div>
+            <a href="puzzlefix.html" class="box" id="tiga"></a>
+            <div class="box-name">Complete the puzzle</div>
+        </div>
+    </div>
+</body>
+</html>

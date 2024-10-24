@@ -1,0 +1,397 @@
+/* Layout dasar untuk body dan container game */
+html {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    background: url(../ASSET/BgBalon.png);
+    background-size: cover;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    padding: 60px; /* Menambahkan padding ke container */
+    box-sizing: border-box; /* Memastikan padding tidak menambah ukuran container */
+}
+
+/* Balloon styling */
+.balloon {
+    position: absolute;
+    width: 60px;
+    height: 70px;
+    background-color: #ff4081;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 2; /* Balloon tetap berada di bawah overlay */
+}
+
+.balloon::before {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 15px;
+    background-color: #ff4081;
+    border-radius: 0 0 5px 5px;
+}
+
+/* Animasi untuk balon yang melayang */
+@keyframes float {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+}
+
+/* Animasi pecah balon */
+.particle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #ff6b6b;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: explode 0.5s forwards ease-out; /* Animasi pecahan balon */
+}
+
+/* Animasi pecah balon */
+@keyframes explode {
+    0% {
+        transform: scale(1) translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.1) translate(100px, 100px); /* Arah dan jarak pecahan */
+        opacity: 0;
+    }
+}
+
+/* Overlay untuk background saat pop-up tampil */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 10; /* Overlay muncul di depan game container dan balon */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#overlay.hidden {
+    display: none;
+}
+
+/* Styling untuk pop-up pertanyaan */
+#question-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    z-index: 20; /* Pop-up muncul di depan overlay */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    font-family: Arial, sans-serif;
+}
+
+#question {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+    padding: 0 10px;
+}
+
+#answer {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    border: 2px solid #4ecdc4;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+#submit {
+    background-color: #4ecdc4;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#submit:hover {
+    background-color: #45b7a7;
+}
+
+#question-box.hidden {
+    display: none;
+}
+
+/* Styling untuk custom alert */
+#custom-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    z-index: 30; /* Alert muncul paling depan */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    font-family: Arial, sans-serif;
+}
+
+#custom-alert.hidden {
+    display: none;
+}
+
+#alert-message {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+#alert-ok {
+    background-color: #4ecdc4;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#alert-ok:hover {
+    background-color: #45b7a7;
+}
+
+/* Timer styling */
+#timer {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    background-color: #ff0000d7;
+    padding: 10px;
+    color: #ffffff;
+    border-radius: 5px;
+    z-index: 5; /* Timer tetap di atas tapi di bawah overlay dan pop-up */
+}
+
+/* Score popup styling */
+#score-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid black;
+    padding: 20px;
+    z-index: 1000;
+}
+
+#score-popup.hidden {
+    display: none;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Pop-up akhir */
+/* Animasi masuk untuk pop-up skor */
+@keyframes slideIn {
+    0% {
+        transform: translate(-50%, -60%); /* Mulai dari atas */
+        opacity: 0; /* Awalnya transparan */
+    }
+    100% {
+        transform: translate(-50%, -50%); /* Posisi akhir */
+        opacity: 1; /* Akhirnya terlihat */
+    }
+}
+
+/* Styling untuk pop-up skor */
+#score-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff; /* Warna latar belakang putih */
+    padding: 20px;
+    border-radius: 10px; /* Sudut membulat */
+    text-align: center; /* Pusatkan teks */
+    z-index: 30; /* Pastikan pop-up muncul di depan overlay */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Bayangan halus */
+    font-family: Arial, sans-serif; /* Font yang mudah dibaca */
+    animation: slideIn 0.5s ease; /* Terapkan animasi */
+}
+
+/* Teks dalam pop-up skor */
+#score-popup p {
+    font-size: 18px; /* Ukuran font */
+    color: #333; /* Warna teks */
+    margin: 10px 0; /* Margin antara paragraf */
+}
+
+/* Tombol untuk memulai ulang */
+#restart-btn {
+    background-color: #4ecdc4; /* Warna latar belakang tombol */
+    color: white; /* Warna teks */
+    border: none; /* Tanpa border */
+    padding: 10px 20px; /* Padding tombol */
+    font-size: 16px; /* Ukuran font tombol */
+    border-radius: 5px; /* Sudut membulat pada tombol */
+    cursor: pointer; /* Ubah kursor saat hover */
+    transition: background-color 0.3s; /* Transisi halus saat hover */
+}
+
+#restart-btn:hover {
+    background-color: #45b7a7; /* Warna latar belakang tombol saat hover */
+}
+
+/* Pop-up skor tersembunyi */
+#score-popup.hidden {
+    display: none; /* Tersembunyi saat kelas 'hidden' ditambahkan */
+}
+
+/* Gaya umum untuk tombol */
+.button {
+    background-color: #4ecdc4; /* Warna latar belakang tombol */
+    color: white; /* Warna teks */
+    border: none; /* Tanpa border */
+    padding: 10px 20px; /* Padding tombol */
+    font-size: 16px; /* Ukuran font tombol */
+    border-radius: 5px; /* Sudut membulat pada tombol */
+    cursor: pointer; /* Ubah kursor saat hover */
+    transition: background-color 0.3s; /* Transisi halus saat hover */
+    text-decoration: none; /* Hilangkan garis bawah pada tautan */
+    margin-left: 10px; /* Jarak antara tombol */
+}
+
+.button:hover {
+    background-color: #45b7a7; /* Warna latar belakang tombol saat hover */
+}
+
+#result-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+#result-message {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+#restart-btn, #next-btn {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#restart-btn {
+    background-color: #2196F3;
+    color: white;
+}
+
+#next-btn {
+    background-color: #2196F3;
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+}
+
+#restart-btn:hover, #next-btn:hover {
+    opacity: 0.8;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #f00;
+    animation: confetti-fall 3s linear infinite;
+    z-index: 1000;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Menambahkan media query untuk perangkat dengan layar lebih kecil */
+@media (max-width: 768px) {
+    #game-container {
+        padding: 30px; /* Mengurangi padding untuk layar yang lebih kecil */
+    }
+
+    .balloon {
+        width: 40px; /* Mengurangi ukuran balon untuk layar yang lebih kecil */
+        height: 50px;
+    }
+}
