@@ -23,9 +23,18 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            flex-wrap: wrap; /* Allow items to wrap to the next line */
+        }
+        @media (max-width: 600px) {
+            .container {
+                flex-direction: column; /* Stack items vertically */
+            }
+            .box {
+                width: 200px; /* Adjust width to fit the screen */
+                margin: 10px 0; /* Adjust margin for vertical spacing */
+            }
         }
         .box {
-            width: 200px;
             height: 200px;
             margin: 30px;
             background-color: lightblue;
@@ -35,6 +44,7 @@
             text-align: center;
             cursor: pointer;
             transition: ease-in 0.1s;
+            min-width: 200px; /* Set a minimum width to prevent shrinking */
         }
         .box:hover{
             transform: translateY(-4px);
